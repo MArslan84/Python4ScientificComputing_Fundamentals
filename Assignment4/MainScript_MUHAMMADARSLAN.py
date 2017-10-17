@@ -1,58 +1,46 @@
 # 16/10/17
 
-#----------------Assignment-4--Part-1------------------#
+#  ----------------Assignment-4--Part-2--------------------
 
-#---------Example (Calculation of U-Values)-----------#
+#  ---Example (Calculation of Heat factor & Heat load)------------
 
-#------------------MUHAMMAD ARSLAN------------------- #
+# ------------------MUHAMMAD ARSLAN--------------------
 
-#-----------------Using Function ---------------------#
+#-------------------Using Import Function ----------------------------------------------------------#
 
-#------------------Values-Defined---------------------#
 
-Wall_material={"Wood bevel":{"Rvalue":0.14,"length":13},"Wood fiberboard":{"Rvalue":0.23,"length":13},"Glass fiber insulation":{"Rvalue":2.52,"length":90},"Wood stud":{"Rvalue":0.63,"length":90},"Gypsum wallboard":{"Rvalue":0.079,"length":13},"insideSurface":{"Rvalue":0.12},"OutsideSurfaceWinter":{"Rvalue":0.030},"Asphalt shingle roofing":{"Rvalue":0.077}}
-layers_In_series=["insideSurface","OutsideSurfaceWinter","Wood bevel","Wood fiberboard","Gypsum wallboard"]
-fractionBetweenstuds=0.70
+import os
+os.chdir("C:\Users\arslan\Desktop\Assignment4")  #Adress for Calling function from first file
+import WallCalculation_MUHAMMADARSLAN as A
+
+#----Defining all values----
+
+layers_In_series=["Wood bevel","Gypsum wallboard","insideSurface","OutsideSurfaceWinter"]
+layers_In_parallel=["Glass fiber insulation","Wood stud"]
 layers_for_Roof=["insideSurface","outsideSurfaceWinter","Wood","Asphalt shingle roofing"]
 layers_for_Door=["insideSurface","outsideSurfaceWinter","Wood"]
 
-def wallCalc_LIS():       #Layers in series
+D_T= (25)                                                  #Change in temp: in deg C
+W_Area,R_Area,D_Area=105.8,200,2.2                         #Areas in m^2
+ 
+#----Getting the U-values from imported functions of First File----
 
-      between_Studs=layers_In_series+["Glass fiber insulation"]
-      at_Studs=layers_In_series+["Wood stud"]
+Uwall=A.wallCalc_LIS()
+Udoor=A.wallCalc_DR()["U-Value of Door"]
+Uroof=A.wallCalc_DR()["U-value of Roof"]
 
-      RValue_between=0           
-      RValue_at=0                
+#----Calculating the Heating factor from given data----
 
-      for layer in between_Studs:
-          RValue_between+=Wall_material[layer]["Rvalue"]          
+HFwall= ((Uwall)*(D_T))          #Heating factor for wall
+HFdoor= ((Udoor)*(D_T))          #Heating factor for door 
+HFroof= ((Uroof)*(D_T))          #Heating factor for roof
 
-      for layer in at_Studs:
-          RValue_at+=Wall_material[layer]["Rvalue"]
-          
-          Uwall=(fractionBetweenstuds*(1/RValue_between)+(1-fractionBetweenstuds)*(1/RValue_at))
-          return Uwall
-          
-#print ("\The u value of wall is: "+str(wallCalc_LIS())+" wat")           
-              
-def wallCalc_DR():
+#----Calculating the Heating load-------
 
-      R_Door=0           
-      R_Roof=0  
-       
-      Layers_for_Door=layers_In_series+["Glass fiber insulation"]
-      Layers_for_Roof=layers_In_series+["Wood stud"]             
+QHwall= ((HFwall)*(W_Area))      #Heating load for wall
+QHdoor= ((HFdoor)*(D_Area))      #Heating load for door 
+QHroof= ((HFroof)*(R_Area))      #Heating load for roof
 
-      for layer in Layers_for_Door:
-          
-           R_Door+=Wall_material[layer]["Rvalue"]
-           Udoor=(1/R_Door)          
+HeatLoad_total= ((QHwall)+(QHdoor)+(QHroof))
 
-      for layer in Layers_for_Roof:
-          
-           R_Roof+=Wall_material[layer]["Rvalue"]
-           Uroof= (1/R_Roof)
-           
-      return {"U-Value of Door":Udoor,"U-value of Roof":Uroof}    
-          
-                        
+print("\nThe total heating load is: "+str(HeatLoad_total)+" Watt")
